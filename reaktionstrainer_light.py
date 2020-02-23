@@ -11,7 +11,7 @@ from math import floor
 
 
 colors=["red","green","blue","yellow"]
-sleepRange=(1,3)
+sleepRange=[1,3]
 
 
 # copied from https://stackoverflow.com/questions/323972/is-there-any-way-to-kill-a-thread
@@ -62,6 +62,9 @@ def fct_runColors(arg_label):
 		if current_thread().stopped():
 			return 0
 		elif not current_thread().paused():
+			sleepOffset = sleepRange[0]
+			sleepDuration = sleepRange[1] - sleepRange[0]
+
 			# compute next color (must not be current color)
 			newColor = floor( 4*random() )
 			while newColor == numColor:
@@ -123,7 +126,7 @@ mainWindow.grid_columnconfigure(2, weight=1)
 ##############################
 
 # create thread which will be started and stopped by the respective buttons
-thread_switchColors = StoppableThread(target=fct_runColors, args=(label_colourArea, ) ) 
+thread_switchColors = StoppableThread(target=fct_runColors, args=(label_colourArea, ), daemon=True ) 
 
 
 ###############################
