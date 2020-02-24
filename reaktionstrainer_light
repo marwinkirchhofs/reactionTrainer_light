@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# just an execute script for reaktionstrainer_light.py
+
+cd -- "$(dirname "$0")"
+python3 reaktionstrainer_light.py
