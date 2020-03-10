@@ -3,11 +3,14 @@
 # just consists of a window with colour area and start/stop button
 
 
+import pdb
+
 from tkinter import *
 from threading import *
 from time import sleep
 from random import random
 from math import floor
+import pickle
 
 
 # colors used
@@ -102,8 +105,9 @@ def updateWait(str_minWait, str_maxWait, f_waitTimes):
 			waitTimes["high"] = maxWaitTime
 			
 			# store new wait time values
-#			with open(f_waitTimes, "wb") as file_waitTimes:
-#				pickle.dump(waitTimes, file_waitTimes, protocol=0)
+			with open(f_waitTimes, "wb") as file_waitTimes:
+				print("values stored")
+				pickle.dump(waitTimes, file_waitTimes)
 	except:
 		pass
 	
@@ -129,25 +133,36 @@ bt_quit = Button(mainWindow, text="Quit", command=mainWindow.quit)
 ## create empty label as colour area
 label_colourArea = Label(mainWindow, text="", bg="red")
 
+
 ## labels and entry fields for wait values
+
+# load/set values of minWait, maxWait variables (get passed to widgets automatically)
+try:
+	with open(f_waitTimes, "rb") as file_waitTimes:
+		waitTimes = pickle.load(file_waitTimes)
+except:
+	print("f_waitTimes not found")
+	waitTimes["low"] = 2
+	waitTimes["high"] = 4
+
 # tkinter variables to store minWait and maxWait
-str_minWait = StringVar(mainWindow)
-str_maxWait = StringVar(mainWindow)
+str_minWait = StringVar(mainWindow, value=str(waitTimes["low"]))
+str_maxWait = StringVar(mainWindow, value=str(waitTimes["high"]))
 str_minWait.trace_add("write", lambda name, index, mode, str_minWait=str_minWait, str_maxWait=str_maxWait, f_waitTimes=f_waitTimes: updateWait(str_minWait, str_maxWait, f_waitTimes))
 str_maxWait.trace_add("write", lambda name, index, mode, str_minWait=str_minWait, str_maxWait=str_maxWait, f_waitTimes=f_waitTimes: updateWait(str_minWait, str_maxWait, f_waitTimes))
+
 # window components for wait times
 label_waitTime = Label(mainWindow, text="Anzeigezeit:")
 label_minWait = Label(mainWindow, text="min.")
 label_maxWait = Label(mainWindow, text="max.")
 entry_minWait = Entry(mainWindow, textvariable=str_minWait)
-entry_minWait.insert(10, str_minWait.get())
+#entry_minWait.insert(10, str_minWait.get())
 entry_maxWait = Entry(mainWindow, textvariable=str_maxWait)
-entry_maxWait.insert(10, str_maxWait.get())
+#entry_maxWait.insert(10, str_maxWait.get())
 scale_minWait = Scale(mainWindow, from_=0, to=10, orient=HORIZONTAL, showvalue=0, variable=str_minWait)
 scale_maxWait = Scale(mainWindow, from_=0, to=10, orient=HORIZONTAL, showvalue=0,variable=str_maxWait)
-# set initial values of minWait, maxWait variables (get passed to widgets automatically)
-str_minWait.set("4")
-str_maxWait.set("7")
+
+
 
 ## add components to mainWindow
 label_colourArea.grid(row=0, column=0, sticky=W+E+N+S, columnspan=5)
@@ -161,6 +176,7 @@ scale_maxWait.grid(row=2, column=3, columnspan=2)
 bt_start.grid(row=3, column=0, columnspan=2)
 bt_stop.grid(row=3, column=2, columnspan=2)
 bt_quit.grid(row=3, column=4)
+
 
 ## set up row and column weights
 mainWindow.grid_rowconfigure(0, weight=4)
