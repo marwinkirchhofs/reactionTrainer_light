@@ -109,43 +109,52 @@ def updateWait(str_minWait, str_maxWait):
 #### set up gui ####
 ####################
 
-# create window
+## create window
 mainWindow = Tk()
 mainWindow.title("reaction trainer light")
 
-# create start and stop buttons
+## create start and stop buttons
 bt_start = Button(mainWindow, text="Start")
 bt_stop = Button(mainWindow, text="Stop")
 bt_quit = Button(mainWindow, text="Quit", command=mainWindow.quit)
 
-# create empty label as colour area
+## create empty label as colour area
 label_colourArea = Label(mainWindow, text="", bg="red")
 
-# labels and entry fields for wait values
-label_waitTime = Label(mainWindow, text="Anzeigezeit:")
-label_minWait = Label(mainWindow, text="min.")
-label_maxWait = Label(mainWindow, text="max.")
+## labels and entry fields for wait values
+# tkinter variables to store minWait and maxWait
 str_minWait = StringVar(mainWindow)
 str_maxWait = StringVar(mainWindow)
 str_minWait.trace_add("write", lambda name, index, mode, str_minWait=str_minWait, str_maxWait=str_maxWait: updateWait(str_minWait, str_maxWait))
 str_maxWait.trace_add("write", lambda name, index, mode, str_minWait=str_minWait, str_maxWait=str_maxWait: updateWait(str_minWait, str_maxWait))
+# window components for wait times
+label_waitTime = Label(mainWindow, text="Anzeigezeit:")
+label_minWait = Label(mainWindow, text="min.")
+label_maxWait = Label(mainWindow, text="max.")
 entry_minWait = Entry(mainWindow, textvariable=str_minWait)
-entry_minWait.insert(10,"4")
+entry_minWait.insert(10, str_minWait.get())
 entry_maxWait = Entry(mainWindow, textvariable=str_maxWait)
-entry_maxWait.insert(10,"7")
+entry_maxWait.insert(10, str_maxWait.get())
+scale_minWait = Scale(mainWindow, from_=0, to=10, orient=HORIZONTAL, showvalue=0, variable=str_minWait)
+scale_maxWait = Scale(mainWindow, from_=0, to=10, orient=HORIZONTAL, showvalue=0,variable=str_maxWait)
+# set initial values of minWait, maxWait variables (get passed to widgets automatically)
+str_minWait.set("4")
+str_maxWait.set("7")
 
-# add components to mainWindow
+## add components to mainWindow
 label_colourArea.grid(row=0, column=0, sticky=W+E+N+S, columnspan=5)
 label_waitTime.grid(row=1, column=0)
 label_minWait.grid(row=1, column=1)
 entry_minWait.grid(row=1, column=2)
 label_maxWait.grid(row=1, column=3)
 entry_maxWait.grid(row=1, column=4)
-bt_start.grid(row=2, column=0, columnspan=2)
-bt_stop.grid(row=2, column=2, columnspan=2)
-bt_quit.grid(row=2, column=4)
+scale_minWait.grid(row=2, column=1, columnspan=2)
+scale_maxWait.grid(row=2, column=3, columnspan=2)
+bt_start.grid(row=3, column=0, columnspan=2)
+bt_stop.grid(row=3, column=2, columnspan=2)
+bt_quit.grid(row=3, column=4)
 
-# set up row and column weights
+## set up row and column weights
 mainWindow.grid_rowconfigure(0, weight=4)
 mainWindow.grid_rowconfigure(1, weight=0)
 mainWindow.grid_rowconfigure(2, weight=0)
