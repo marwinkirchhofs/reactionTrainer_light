@@ -10,8 +10,11 @@ from random import random
 from math import floor
 
 
+# colors used
 colors=["red","green","blue","yellow"]
-sleepRange=[1,3]
+# variable and file to store waiting times
+waitTimes={"low":1, "high":3}
+f_waitTimes=".reactionTrainer_waitTimes.pkl"
 
 
 # copied from https://stackoverflow.com/questions/323972/is-there-any-way-to-kill-a-thread
@@ -48,11 +51,11 @@ class StoppableThread(Thread):
 
 def fct_runColors(arg_label):
 
-	sleepOffset = sleepRange[0]
-	sleepDuration = sleepRange[1] - sleepRange[0]
+	sleepOffset = waitTimes["low"]
+	sleepDuration = waitTimes["high"] - waitTimes["low"]
 
 	# initial color 
-	numColor = floor( 4*random() )
+	numColor = floor( len(colors)*random() )
 	newColor = numColor
 	arg_label.configure(bg=colors[numColor])
 	print("new color = " + colors[numColor])
@@ -63,13 +66,13 @@ def fct_runColors(arg_label):
 		if current_thread().stopped():
 			return 0
 		elif not current_thread().paused():
-			sleepOffset = sleepRange[0]
-			sleepDuration = sleepRange[1] - sleepRange[0]
+			sleepOffset = waitTimes["low"]
+			sleepDuration = waitTimes["high"] - waitTimes["low"]
 
 			# compute next color (must not be current color)
-			newColor = floor( 4*random() )
+			newColor = floor( len(colors)*random() )
 			while newColor == numColor:
-				newColor = floor( 4*random() )
+				newColor = floor( len(colors)*random() )
 			numColor = newColor
 			print("new color = " + colors[numColor])
 			# set new color
@@ -87,15 +90,20 @@ def btCmd_stop(event=0):
 	print("stop button clicked")
 	print("max: " + str_maxWait + ", min: " + str_minWait)
 
-def updateWait(str_minWait, str_maxWait):
+def updateWait(str_minWait, str_maxWait, f_waitTimes):
 	print("min: " + str_minWait.get() + "max: " + str_maxWait.get())
 	# update time values if valid
 	try:
-		minWait = int(str_minWait.get())
-		maxWait = int(str_maxWait.get())
-		if not maxWait < minWait:
-			sleepRange[0] = minWait
-			sleepRange[1] = maxWait
+		minWaitTime = int(str_minWait.get())
+		maxWaitTime = int(str_maxWait.get())
+		if not maxWaitTime < minWaitTime:
+			# update wait time values 
+			waitTimes["low"] = minWaitTime
+			waitTimes["high"] = maxWaitTime
+			
+			# store new wait time values
+#			with open(f_waitTimes, "wb") as file_waitTimes:
+#				pickle.dump(waitTimes, file_waitTimes, protocol=0)
 	except:
 		pass
 	
@@ -125,8 +133,8 @@ label_colourArea = Label(mainWindow, text="", bg="red")
 # tkinter variables to store minWait and maxWait
 str_minWait = StringVar(mainWindow)
 str_maxWait = StringVar(mainWindow)
-str_minWait.trace_add("write", lambda name, index, mode, str_minWait=str_minWait, str_maxWait=str_maxWait: updateWait(str_minWait, str_maxWait))
-str_maxWait.trace_add("write", lambda name, index, mode, str_minWait=str_minWait, str_maxWait=str_maxWait: updateWait(str_minWait, str_maxWait))
+str_minWait.trace_add("write", lambda name, index, mode, str_minWait=str_minWait, str_maxWait=str_maxWait, f_waitTimes=f_waitTimes: updateWait(str_minWait, str_maxWait, f_waitTimes))
+str_maxWait.trace_add("write", lambda name, index, mode, str_minWait=str_minWait, str_maxWait=str_maxWait, f_waitTimes=f_waitTimes: updateWait(str_minWait, str_maxWait, f_waitTimes))
 # window components for wait times
 label_waitTime = Label(mainWindow, text="Anzeigezeit:")
 label_minWait = Label(mainWindow, text="min.")
